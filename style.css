@@ -1,0 +1,305 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #fff5f8;
+    color: #333;
+}
+
+header {
+    text-align: center;
+    background: #e91e63;
+    color: white;
+    padding: 30px 20px;
+}
+
+header h1 {
+    font-size: 38px;
+    margin-bottom: 8px;
+}
+
+header p {
+    font-size: 18px;
+}
+
+nav {
+    background: white;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+nav a {
+    color: #e91e63;
+    text-decoration: none;
+    margin: 0 15px;
+    font-weight: bold;
+}
+
+main {
+    max-width: 900px;
+    margin: 30px auto;
+    padding: 0 20px;
+}
+
+section {
+    background: white;
+    padding: 25px;
+    margin-bottom: 25px;
+    border-radius: 15px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+}
+
+h2 {
+    color: #e91e63;
+    margin-bottom: 15px;
+}
+
+p {
+    line-height: 1.6;
+}
+
+input {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin: 10px 5px 10px 0;
+}
+
+button {
+    padding: 12px 18px;
+    background: #e91e63;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #c2185b;
+}
+
+li {
+    margin: 10px 0;
+}
+
+footer {
+    text-align: center;
+    background: #e91e63;
+    color: white;
+    padding: 20px;
+    margin-top: 30px;
+}
+
+
+/* ================= CALENDAR ================= */
+
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.calendar-header h3 {
+    color: #e91e63;
+    font-size: 24px;
+}
+
+.calendar-header button {
+    width: 45px;
+    height: 45px;
+    padding: 0;
+    font-size: 22px;
+    border-radius: 50%;
+}
+
+.calendar-weekdays,
+.calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 8px;
+}
+
+.calendar-weekdays div {
+    text-align: center;
+    font-weight: bold;
+    color: #e91e63;
+    padding: 10px;
+}
+
+
+/* Normal calendar dates */
+
+.calendar-day {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    background: #fff5f8;
+    cursor: pointer;
+    font-weight: 500;
+    transition: 0.2s;
+    border: 1px solid #fce4ec;
+}
+
+
+/* Hover */
+
+.calendar-day:hover {
+    transform: scale(1.05);
+    background: #fce4ec;
+}
+
+
+/* Actual Period */
+
+.calendar-day.actual {
+    background: #e91e63;
+    color: white;
+    font-weight: bold;
+    border: 2px solid #e91e63;
+}
+
+
+/* Predicted Period */
+
+.calendar-day.predicted {
+    background: #f8bbd0;
+    color: #880e4f;
+    font-weight: bold;
+    border: 2px solid #e91e63;
+}
+
+
+/* Today */
+
+.calendar-day.today {
+    background: #9c27b0;
+    color: white;
+    font-weight: bold;
+    border: 2px solid #7b1fa2;
+}
+
+
+/* Calendar Legend */
+
+.calendar-legend {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    margin-top: 20px;
+    font-size: 14px;
+}
+
+.calendar-legend span {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.period-dot,
+.predicted-dot,
+.today-dot {
+    width: 12px;
+    height: 12px;
+    display: inline-block;
+    border-radius: 50%;
+}
+
+.period-dot {
+    background: #e91e63;
+}
+
+.predicted-dot {
+    background: #f8bbd0;
+}
+
+.today-dot {
+    background: #9c27b0;
+}
+
+
+/* ================= MOBILE ================= */
+
+@media (max-width: 600px) {
+
+    .calendar-weekdays,
+    .calendar-days {
+        gap: 4px;
+    }
+
+    .calendar-day {
+        height: 38px;
+        font-size: 14px;
+    }
+
+    .calendar-legend {
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+}
+
+
+/* ================= LOGIN / REGISTER ================= */
+
+.login-box {
+    max-width: 450px;
+    margin: 50px auto;
+    text-align: center;
+}
+
+.login-box form {
+    margin-top: 25px;
+    text-align: left;
+}
+
+.login-box label {
+    display: block;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+.login-box input {
+    width: 100%;
+    margin-top: 8px;
+}
+
+.login-box button {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.register-link {
+    margin-top: 20px;
+}
+
+.register-link a {
+    color: #e91e63;
+    font-weight: bold;
+    text-decoration: none;
+}
+/* ================= MOBILE RESPONSIVE NAVIGATION ================= */
+
+@media (max-width: 600px) {
+
+    nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px 14px;
+        padding: 10px 8px;
+    }
+
+    nav a {
+        font-size: 14px;
+        white-space: nowrap;
+        padding: 6px 4px;
+    }
+
+}

@@ -1,0 +1,522 @@
+<?php
+session_start();
+
+if (!isset($_SESSION["user_id"])) {
+    header("Location: login.html");
+    exit;
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>CycloCare - Period Health Tracker</title>
+
+    <link rel="stylesheet"
+          href="style.css">
+
+    <style>
+
+        /* ================= FORM MESSAGES ================= */
+
+        .form-message {
+            margin: 10px 0;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .form-message.success {
+            display: block;
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .form-message.error {
+            display: block;
+            background: #ffebee;
+            color: #c62828;
+        }
+
+
+        /* ================= REMINDER TIME ================= */
+
+        .reminder-time {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+
+        /* ================= MOBILE ================= */
+
+        @media (max-width: 600px) {
+
+            .reminder-time {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 8px;
+            }
+
+            .reminder-time select {
+                width: 100%;
+            }
+
+            .reminder-time button {
+                width: 100%;
+            }
+
+            .calendar-weekdays {
+                display: grid;
+                grid-template-columns:
+                    repeat(7, 1fr);
+                width: 100%;
+                gap: 4px;
+            }
+
+            .calendar-weekdays div {
+                text-align: center;
+                font-size: 12px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- ================= HEADER ================= -->
+
+    <header>
+
+        <h1>🌸 CycloCare</h1>
+
+        <p>
+            Your Period Health & Wellness Companion
+        </p>
+
+    </header>
+
+
+    <!-- ================= NAVIGATION ================= -->
+
+    <nav>
+
+        <a href="#home">Home</a>
+
+        <a href="#tracker">
+            Period Tracker
+        </a>
+
+        <a href="#symptoms">
+            Symptoms
+        </a>
+        <a href="health.html">
+            Health Tips
+        </a>
+
+        <a href="#reminders">
+            Reminders
+        </a>
+
+        <a href="profile.html">
+            Profile
+        </a>
+
+    </nav>
+
+
+    <main>
+
+
+        <!-- ================= HOME ================= -->
+
+        <section id="home">
+            <h2 id="welcomeMessage">
+                Hello! 🌸
+            </h2>
+
+            <p>
+                Here's your CycloCare overview.
+            </p>
+            <div class="dashboard">
+
+
+                <div class="dashboard-card">
+
+                    <h3>
+                        🩸 Last Period
+                    </h3>
+
+                    <p id="dashboardLastPeriod">
+                        Not available
+                    </p>
+
+                </div>
+
+
+                <div class="dashboard-card">
+
+                    <h3>
+                        🔮 Next Period
+                    </h3>
+
+                    <p id="dashboardNextPeriod">
+                        Not available
+                    </p>
+
+                </div>
+
+
+                <div class="dashboard-card">
+
+                    <h3>
+                        🤕 Recent Symptom
+                    </h3>
+
+                    <p id="dashboardSymptom">
+                        No symptoms recorded
+                    </p>
+
+                </div>
+
+
+                <div class="dashboard-card">
+
+                    <h3>
+                        ⏰ Next Reminder
+                    </h3>
+
+                    <p id="dashboardReminder">
+                        No reminders scheduled
+                    </p>
+
+                </div>
+
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= PERIOD TRACKER ================= -->
+
+        <section id="tracker">
+
+            <h2>
+                📅 Period Tracker
+            </h2>
+
+            <!-- ADD NEW PERIOD -->
+            <div style="margin-bottom: 20px;">
+                <label for="periodDate">
+                    Add Period Date:
+                </label>
+                <input
+                    type="date"
+                    id="periodDate"
+                >
+                <button
+                    type="button"
+                    onclick="addPeriod()"
+                >
+                    Add Period
+                </button>
+            </div>
+
+            <!-- UPDATE ACTUAL PERIOD DATE (IF PREDICTION WAS MISSED/DIFFERENT) -->
+            <div style="margin-top: 15px; padding-top: 15px; border-top: 1px dashed #ccc;">
+                <label for="updatePeriodDate">
+                    Got your period on a different date? Update actual start date:
+                </label>
+                <input
+                    type="date"
+                    id="updatePeriodDate"
+                >
+                <button
+                    type="button"
+                    onclick="updateActualPeriod()"
+                >
+                    Update & Recalculate
+                </button>
+            </div>
+
+            <p
+                id="periodMessage"
+                class="form-message"
+            ></p>
+
+        </section>
+
+
+        <!-- ================= SYMPTOMS ================= -->
+
+        <section id="symptoms">
+
+            <h2>
+                📝 Symptom Tracker
+            </h2>
+
+
+            <input
+                type="text"
+                id="symptom"
+                placeholder="Enter your symptom"
+            >
+
+
+            <button
+                type="button"
+                onclick="addSymptom()"
+            >
+                Add Symptom
+            </button>
+
+
+            <p
+                id="symptomMessage"
+                class="form-message"
+            ></p>
+
+
+            <ul id="symptomList"></ul>
+
+        </section>
+
+
+        <!-- ================= HEALTH TIPS ================= -->
+
+        <section id="tips">
+
+            <h2>
+                💡 Health Tips
+            </h2>
+
+
+            <ul>
+
+                <li>
+                    Stay hydrated.
+                </li>
+
+                <li>
+                    Get enough rest.
+                </li>
+
+                <li>
+                    Maintain a balanced diet.
+                </li>
+
+                <li>
+                    Track changes in your cycle and symptoms.
+                </li>
+
+            </ul>
+
+        </section>
+
+
+        <!-- ================= REMINDERS ================= -->
+
+        <section id="reminders">
+
+            <h2>
+                💊 Medication & Reminders
+            </h2>
+
+
+            <input
+                type="text"
+                id="medication"
+                placeholder="Enter medication or reminder"
+            >
+
+
+            <input
+                type="date"
+                id="reminderDate"
+            >
+
+
+            <!-- ================= REMINDER TIME ================= -->
+
+            <div class="reminder-time">
+
+
+                <select id="reminderHour">
+
+                    <option value="">
+                        Hour
+                    </option>
+
+                    <option value="01">01</option>
+                    <option value="02">02</option>
+                    <option value="03">03</option>
+                    <option value="04">04</option>
+                    <option value="05">05</option>
+                    <option value="06">06</option>
+                    <option value="07">07</option>
+                    <option value="08">08</option>
+                    <option value="09">09</option>
+                    <option value="10">10</option>
+                    <option value="11">11</option>
+                    <option value="12">12</option>
+
+                </select>
+
+
+                <select id="reminderMinute">
+
+                    <option value="">
+                        Minute
+                    </option>
+
+                    <option value="00">00</option>
+                    <option value="05">05</option>
+                    <option value="10">10</option>
+                    <option value="15">15</option>
+                    <option value="20">20</option>
+                    <option value="25">25</option>
+                    <option value="30">30</option>
+                    <option value="35">35</option>
+                    <option value="40">40</option>
+                    <option value="45">45</option>
+                    <option value="50">50</option>
+                    <option value="55">55</option>
+
+                </select>
+
+
+                <select id="reminderAmPm">
+
+                    <option value="">
+                        AM/PM
+                    </option>
+
+                    <option value="AM">
+                        AM
+                    </option>
+
+                    <option value="PM">
+                        PM
+                    </option>
+
+                </select>
+
+
+                <button
+                    type="button"
+                    onclick="addReminder()"
+                >
+                    Add Reminder
+                </button>
+
+
+            </div>
+
+
+            <p
+                id="reminderMessage"
+                class="form-message"
+            ></p>
+
+
+            <ul id="reminderList"></ul>
+
+        </section>
+
+
+        <!-- ================= CALENDAR ================= -->
+
+        <section id="calendar">
+
+            <h2>
+                📅 Cycle Calendar
+            </h2>
+
+
+            <div class="calendar-header">
+
+                <button
+                    type="button"
+                    onclick="previousMonth()"
+                >
+                    ‹
+                </button>
+
+
+                <h3 id="monthYear"></h3>
+                <button
+                    type="button"
+                    onclick="nextMonth()"
+                >
+                    ›
+                </button>
+
+            </div>
+
+
+            <div class="calendar-weekdays">
+
+                <div>Sun</div>
+                <div>Mon</div>
+                <div>Tue</div>
+                <div>Wed</div>
+                <div>Thu</div>
+                <div>Fri</div>
+                <div>Sat</div>
+
+            </div>
+
+
+            <div
+                id="calendarDays"
+                class="calendar-days"
+            ></div>
+
+
+            <div class="calendar-legend">
+
+                <span>
+                    <span class="legend-box actual"></span>
+                    Actual Period
+                </span>
+
+                <span>
+                    <span class="legend-box predicted"></span>
+                    Predicted Period
+                </span>
+
+                <span>
+                    <span class="legend-box today"></span>
+                    Today
+                </span>
+
+            </div>
+
+        </section>
+
+
+    </main>
+
+
+    <!-- ================= JAVASCRIPT ================= -->
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
