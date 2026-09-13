@@ -81,7 +81,7 @@
     </footer>
 
     <script>
-        function handleRegister(event) {
+      function handleRegister(event) {
             event.preventDefault();
             
             let nameInput = document.getElementById("name") ? document.getElementById("name").value.trim() : "";
@@ -98,6 +98,8 @@
             
             if (emailInput) {
                 localStorage.setItem("userEmail", emailInput);
+                // Set active user key prefix for new account
+                localStorage.setItem("currentUserKey", emailInput.toLowerCase());
             }
 
             window.location.href = "index.html";
