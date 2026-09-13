@@ -61,20 +61,21 @@
     </footer>
 
     <script>
-      function handleLogin(event) {
-            event.preventDefault(); // Stop form from submitting to login.php
+     function handleLogin(event) {
+            event.preventDefault();
             
             let emailInput = document.getElementById("email").value.trim();
             
-            // Save login state and user info in browser storage
             sessionStorage.setItem("loggedIn", "true");
             if (emailInput) {
                 localStorage.setItem("userEmail", emailInput);
                 let namePart = emailInput.split('@')[0];
-                localStorage.setItem("userName", namePart.charAt(0).toUpperCase() + namePart.slice(1));
+                let formattedName = namePart.charAt(0).toUpperCase() + namePart.slice(1);
+                localStorage.setItem("userName", formattedName);
+                // Set active user key prefix
+                localStorage.setItem("currentUserKey", emailInput.toLowerCase());
             }
 
-            // Redirect to main tracker page
             window.location.href = "index.html";
         }
     </script>

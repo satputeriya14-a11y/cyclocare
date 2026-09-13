@@ -1,6 +1,7 @@
 // ================= PERIOD HISTORY (LOCAL STORAGE) =================
 
-let periodHistory = JSON.parse(localStorage.getItem("periodHistory")) || [];
+let userKey = localStorage.getItem("currentUserKey") || "default";
+let periodHistory = JSON.parse(localStorage.getItem(userKey + "_periodHistory")) || [];
 
 function loadPeriodsFromDatabase() {
     console.log("Periods loaded from local storage:", periodHistory);
@@ -27,7 +28,7 @@ function addPeriod() {
         periodHistory.sort(function(a, b) {
             return new Date(b) - new Date(a);
         });
-        localStorage.setItem("periodHistory", JSON.stringify(periodHistory));
+        localStorage.setItem(userKey + "_periodHistory", JSON.stringify(periodHistory));
     }
 
     if (message) {
@@ -91,7 +92,7 @@ function updateActualPeriod() {
         periodHistory.unshift(newDate);
     }
 
-    localStorage.setItem("periodHistory", JSON.stringify(periodHistory));
+    localStorage.setItem(userKey + "_periodHistory", JSON.stringify(periodHistory));
 
     if (message) {
         message.innerText = "Actual period updated & next period recalculated!";
@@ -106,7 +107,7 @@ function updateActualPeriod() {
 
 // ================= SYMPTOMS =================
 
-let symptoms = JSON.parse(localStorage.getItem("symptoms")) || [];
+let symptoms = JSON.parse(localStorage.getItem(userKey + "_symptoms")) || [];
 
 function addSymptom() {
     let symptomInput = document.getElementById("symptom");
@@ -142,7 +143,7 @@ function addSymptom() {
     let formattedDate = parts[2] + "-" + parts[1] + "-" + parts[0];
 
     symptoms.unshift({ symptom: symptom, symptom_date: formattedDate });
-    localStorage.setItem("symptoms", JSON.stringify(symptoms));
+    localStorage.setItem(userKey + "_symptoms", JSON.stringify(symptoms));
 
     displaySymptoms();
     symptomInput.value = "";
@@ -271,7 +272,7 @@ function nextMonth() {
 
 // ================= REMINDERS =================
 
-let reminders = JSON.parse(localStorage.getItem("reminders")) || [];
+let reminders = JSON.parse(localStorage.getItem(userKey + "_reminders")) || [];
 
 function addReminder() {
     let medicationElement = document.getElementById("medication");
@@ -300,7 +301,7 @@ function addReminder() {
     let time = hour + ":" + minute + " " + ampm;
 
     reminders.unshift({ medication: medication, reminder_date: date, reminder_time: time });
-    localStorage.setItem("reminders", JSON.stringify(reminders));
+    localStorage.setItem(userKey + "_reminders", JSON.stringify(reminders));
 
     displayReminders();
     medicationElement.value = "";
