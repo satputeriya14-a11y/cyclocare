@@ -46,7 +46,16 @@
                     <strong>Account:</strong>
                     CycloCare User
                 </p>
-                <button onclick="logoutUser()">
+
+                <!-- ================= PERIOD HISTORY ================= -->
+                <div style="margin-top: 20px; text-align: left;">
+                    <h3>🩸 My Period History</h3>
+                    <ul id="profilePeriodHistory" style="list-style-type: none; padding-left: 0;">
+                        <li>No period history logged yet.</li>
+                    </ul>
+                </div>
+
+                <button onclick="logoutUser()" style="margin-top: 20px;">
                     Logout
                 </button>
             </div>
@@ -55,13 +64,43 @@
 
 
     <!-- ================= SCRIPT ================= -->
-   <script>
+    <script>
         function loadProfile() {
             let name = localStorage.getItem("userName") || "CycloCare User";
             let email = localStorage.getItem("userEmail") || "user@cyclocare.com";
 
             document.getElementById("profileName").innerText = name;
             document.getElementById("profileEmail").innerText = email;
+
+            // Load user-specific period history
+            let userKey = localStorage.getItem("currentUserKey") || "default";
+            let history = JSON.parse(localStorage.getItem(userKey + "_periodHistory")) || [];
+            let historyList = document.getElementById("profilePeriodHistory");
+
+            if (historyList) {
+                if (history.length > 0) {
+                    historyList.innerHTML = "";
+                    history.forEach(function(startDateStr) {
+                        let parts = startDateStr.split("-");
+                        let start = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+                        
+                        // Calculate 5-day period end date
+                        let end = new Date(start);
+                        end.setDate(end.getDate() + 4);
+
+                        let formattedStart = start.toLocaleDateString();
+                        let formattedEnd = end.toLocaleDateString();
+
+                        let li = document.createElement("li");
+                        li.style.padding = "8px 0";
+                        li.style.borderBottom = "1px solid #eee";
+                        li.innerText = "Start: " + formattedStart + "  |  End: " + formattedEnd;
+                        historyList.appendChild(li);
+                    });
+                } else {
+                    historyList.innerHTML = "<li>No period history logged yet.</li>";
+                }
+            }
         }
 
         function logoutUser() {
@@ -73,3 +112,7 @@
 
         loadProfile();
     </script>
+
+</body>
+
+</html>
