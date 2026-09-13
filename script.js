@@ -127,10 +127,21 @@ function addSymptom() {
         return;
     }
 
-    // Use latest Period Start Date as reference; fallback to today if no period logged
-    let symptomDate = (periodHistory.length > 0) ? periodHistory[0] : new Date().toISOString().split('T')[0];
-    
-    symptoms.unshift({ symptom: symptom, symptom_date: symptomDate });
+    // Require a period to be logged first
+    if (periodHistory.length === 0) {
+        if (message) {
+            message.innerText = "Please log your Period Start Date first!";
+            message.className = "form-message error";
+        }
+        return;
+    }
+
+    // Convert period date (YYYY-MM-DD) to DD-MM-YYYY format
+    let rawDate = periodHistory[0];
+    let parts = rawDate.split("-");
+    let formattedDate = parts[2] + "-" + parts[1] + "-" + parts[0];
+
+    symptoms.unshift({ symptom: symptom, symptom_date: formattedDate });
     localStorage.setItem("symptoms", JSON.stringify(symptoms));
 
     displaySymptoms();
