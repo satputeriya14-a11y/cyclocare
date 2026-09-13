@@ -127,8 +127,10 @@ function addSymptom() {
         return;
     }
 
-    let todayStr = new Date().toISOString().split('T')[0];
-    symptoms.unshift({ symptom: symptom, symptom_date: todayStr });
+    // Use latest Period Start Date as reference; fallback to today if no period logged
+    let symptomDate = (periodHistory.length > 0) ? periodHistory[0] : new Date().toISOString().split('T')[0];
+    
+    symptoms.unshift({ symptom: symptom, symptom_date: symptomDate });
     localStorage.setItem("symptoms", JSON.stringify(symptoms));
 
     displaySymptoms();
