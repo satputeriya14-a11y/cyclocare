@@ -4,14 +4,17 @@
 <head>
 
     <meta charset="UTF-8">
-
-    <meta name="viewport"
-          content="width=device-width, initial-scale=1.0">
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CycloCare - Period Health Tracker</title>
 
-    <link rel="stylesheet"
-          href="style.css">
+    <script>
+        // Redirect to login page first if user is not logged in
+        if (!sessionStorage.getItem("loggedIn")) {
+            window.location.href = "login.html";
+        }
+    </script>
+
+    <link rel="stylesheet" href="style.css">
 
     <style>
 
@@ -69,8 +72,7 @@
 
             .calendar-weekdays {
                 display: grid;
-                grid-template-columns:
-                    repeat(7, 1fr);
+                grid-template-columns: repeat(7, 1fr);
                 width: 100%;
                 gap: 4px;
             }
@@ -116,6 +118,7 @@
         <a href="#symptoms">
             Symptoms
         </a>
+
         <a href="health.html">
             Health Tips
         </a>
@@ -137,15 +140,15 @@
         <!-- ================= HOME ================= -->
 
         <section id="home">
-<h2 id="welcomeMessage">
-    Hello! 🌸
-</h2>
+            <h2 id="welcomeMessage">
+                Hello! 🌸
+            </h2>
 
-<p>
-    Here's your CycloCare overview.
-</p>
+            <p>
+                Here's your CycloCare overview.
+            </p>
+
             <div class="dashboard">
-
 
                 <div class="dashboard-card">
 
@@ -198,15 +201,12 @@
 
                 </div>
 
-
             </div>
 
         </section>
 
 
         <!-- ================= PERIOD TRACKER ================= -->
-
-     <!-- ================= PERIOD TRACKER ================= -->
 
         <section id="tracker">
 
@@ -268,13 +268,11 @@
                 📝 Symptom Tracker
             </h2>
 
-
             <input
                 type="text"
                 id="symptom"
                 placeholder="Enter your symptom"
             >
-
 
             <button
                 type="button"
@@ -283,12 +281,10 @@
                 Add Symptom
             </button>
 
-
             <p
                 id="symptomMessage"
                 class="form-message"
             ></p>
-
 
             <ul id="symptomList"></ul>
 
@@ -302,7 +298,6 @@
             <h2>
                 💡 Health Tips
             </h2>
-
 
             <ul>
 
@@ -335,13 +330,11 @@
                 💊 Medication & Reminders
             </h2>
 
-
             <input
                 type="text"
                 id="medication"
                 placeholder="Enter medication or reminder"
             >
-
 
             <input
                 type="date"
@@ -352,7 +345,6 @@
             <!-- ================= REMINDER TIME ================= -->
 
             <div class="reminder-time">
-
 
                 <select id="reminderHour">
 
@@ -421,7 +413,6 @@
                 >
                     Add Reminder
                 </button>
-
 
             </div>
 

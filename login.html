@@ -4,9 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>Login - CycloCare</title>
-
     <link rel="stylesheet" href="style.css">
 </head>
 
@@ -25,7 +23,7 @@
 
             <p>Welcome back! Please login to continue.</p>
 
-            <form action="login.php" method="POST">
+            <form onsubmit="handleLogin(event)">
 
                 <label for="email">Email Address</label>
                 <input
@@ -62,7 +60,24 @@
         <p>© 2026 CycloCare | Period Health & Wellness System</p>
     </footer>
 
-    <script src="script.js"></script>
+    <script>
+        function handleLogin(event) {
+            event.preventDefault(); // Stop form from submitting to login.php
+            
+            let emailInput = document.getElementById("email").value;
+            
+            // Save login state and user info in browser storage
+            sessionStorage.setItem("loggedIn", "true");
+            if (emailInput) {
+                localStorage.setItem("userEmail", emailInput);
+                let namePart = emailInput.split('@')[0];
+                localStorage.setItem("userName", namePart.charAt(0).toUpperCase() + namePart.slice(1));
+            }
+
+            // Redirect to main tracker page
+            window.location.href = "index.html";
+        }
+    </script>
 
 </body>
 
