@@ -45,7 +45,6 @@ function addPeriod() {
 
 let predictedPeriodDate = null;
 let actualPeriodDate = null;
-
 function calculatePeriod() {
     let latestDate = periodHistory[0];
 
@@ -53,17 +52,21 @@ function calculatePeriod() {
         return;
     }
 
-    let lastDate = new Date(latestDate + "T00:00:00");
+    // Split year, month, day manually to prevent timezone offsets
+    let parts = latestDate.split("-");
+    let year = parseInt(parts[0], 10);
+    let month = parseInt(parts[1], 10) - 1; // Months are 0-indexed in JS
+    let day = parseInt(parts[2], 10);
 
-    actualPeriodDate = new Date(lastDate);
+    actualPeriodDate = new Date(year, month, day);
 
-    let predictedDate = new Date(lastDate);
+    let predictedDate = new Date(year, month, day);
     predictedDate.setDate(predictedDate.getDate() + 28);
 
     predictedPeriodDate = new Date(predictedDate);
 
-    currentMonth = lastDate.getMonth();
-    currentYear = lastDate.getFullYear();
+    currentMonth = month;
+    currentYear = year;
 
     displayCalendar();
 }
@@ -145,17 +148,22 @@ function displaySymptoms() {
     list.innerHTML = "";
     let dashboardSymptom = document.getElementById("dashboardSymptom");
 
-    if (dashboardSymptom && symptoms.length > 0) {
-        dashboardSymptom.innerText = symptoms[0].symptom;
+    if (dashboardSymptom) {
+        if (symptoms.length > 0) {
+            dashboardSymptom.innerText = symptoms[0].symptom;
+        } else {
+            dashboardSymptom.innerText = "No symptoms recorded";
+        }
     }
 
     symptoms.forEach(function(item) {
-        let li = document.createElement("li");
-        li.innerText = item.symptom + " - " + item.symptom_date;
-        list.appendChild(li);
+        if (item && item.symptom) {
+            let li = document.createElement("li");
+            li.innerText = item.symptom + " - " + item.symptom_date;
+            list.appendChild(li);
+        }
     });
 }
-
 
 // ================= CALENDAR =================
 
@@ -301,9 +309,11 @@ function displayReminders() {
 
     list.innerHTML = "";
     reminders.forEach(function(reminder) {
-        let item = document.createElement("li");
-        item.innerText = reminder.medication + " - " + reminder.reminder_date + " at " + reminder.reminder_time;
-        list.appendChild(item);
+        if (reminder && reminder.medication) {
+            let item = document.createElement("li");
+            item.innerText = reminder.medication + " - " + reminder.reminder_date + " at " + reminder.reminder_time;
+            list.appendChild(item);
+        }
     });
 }
 

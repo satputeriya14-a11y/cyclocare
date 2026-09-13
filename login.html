@@ -61,12 +61,17 @@
     </footer>
 
     <script>
-        function handleLogin(event) {
+       function handleLogin(event) {
             event.preventDefault(); // Stop form from submitting to login.php
             
             let emailInput = document.getElementById("email").value.trim();
             
-            // Save login state and user info in browser storage
+            // Clear previous user's local data for a clean session
+            localStorage.removeItem("periodHistory");
+            localStorage.removeItem("symptoms");
+            localStorage.removeItem("reminders");
+
+            // Save new login state and user info in browser storage
             sessionStorage.setItem("loggedIn", "true");
             if (emailInput) {
                 localStorage.setItem("userEmail", emailInput);
