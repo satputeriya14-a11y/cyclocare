@@ -1,35 +1,16 @@
-// ================= PERIOD HISTORY =================
+// ================= PERIOD HISTORY (LOCAL STORAGE) =================
 
-// Period history is loaded from MySQL
-let periodHistory = [];
+let periodHistory = JSON.parse(localStorage.getItem("periodHistory")) || [];
 
 function loadPeriodsFromDatabase() {
-    fetch("get_periods.php")
-        .then(function(response) {
-            return response.json();
-        })
-        .then(function(data) {
-            console.log("Periods loaded from database:", data);
-
-            if (data.length > 0) {
-                // Map dates and sort descending so latest date is always index 0
-                periodHistory = data.map(function(period) {
-                    return period.period_date;
-                }).sort(function(a, b) {
-                    return new Date(b) - new Date(a);
-                });
-
-                calculatePeriod();
-                updateDashboard();
-            }
-        })
-        .catch(function(error) {
-            console.error("Could not load periods:", error);
-        });
+    console.log("Periods loaded from local storage:", periodHistory);
+    if (periodHistory.length > 0) {
+        calculatePeriod();
+        updateDashboard();
+    }
 }
 
 function addPeriod() {
-
     let date = document.getElementById("periodDate").value;
     let message = document.getElementById("periodMessage");
 
@@ -43,83 +24,50 @@ function addPeriod() {
 
     if (!periodHistory.includes(date)) {
         periodHistory.unshift(date);
+        periodHistory.sort(function(a, b) {
+            return new Date(b) - new Date(a);
+        });
+        localStorage.setItem("periodHistory", JSON.stringify(periodHistory));
     }
 
-    // Save period to MySQL database
-    fetch("save_period.php", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: "period_date=" + encodeURIComponent(date)
-    })
-    .then(function(response) {
-        return response.text();
-    })
-    .then(function(data) {
-        console.log(data);
+    if (message) {
+        message.innerText = "Period saved successfully!";
+        message.className = "form-message success";
+    }
 
-        if (data === "Period saved successfully.") {
-            if (message) {
-                message.innerText = "Period saved successfully!";
-                message.className = "form-message success";
-            }
-        } else {
-            if (message) {
-                message.innerText = data;
-                message.className = "form-message error";
-            }
-        }
-    })
-    .catch(function(error) {
-        console.error(error);
-        if (message) {
-            message.innerText = "Could not connect to the database.";
-            message.className = "form-message error";
-        }
-    });
-
-    // Calculate prediction using this entered date
     calculatePeriod();
     updateDashboard();
-
-    // Clear input
     document.getElementById("periodDate").value = "";
 }
 
 
 // ================= PERIOD PREDICTION & UPDATES =================
 
-function calculatePeriod() {
+let predictedPeriodDate = null;
+let actualPeriodDate = null;
 
-    // Get the latest period entered by the user
+function calculatePeriod() {
     let latestDate = periodHistory[0];
 
     if (!latestDate) {
         return;
     }
 
-    // Create date safely
     let lastDate = new Date(latestDate + "T00:00:00");
 
-    // Actual period starts on entered date
     actualPeriodDate = new Date(lastDate);
 
-    // Prediction = entered date + 28 days
     let predictedDate = new Date(lastDate);
     predictedDate.setDate(predictedDate.getDate() + 28);
 
     predictedPeriodDate = new Date(predictedDate);
 
-    // Show the month containing the entered period
     currentMonth = lastDate.getMonth();
     currentYear = lastDate.getFullYear();
 
     displayCalendar();
 }
 
-
-// TEACHER REQUIREMENT: Allow user to update actual period start date
 function updateActualPeriod() {
     let updateInput = document.getElementById("updatePeriodDate");
     let message = document.getElementById("periodMessage");
@@ -134,58 +82,28 @@ function updateActualPeriod() {
 
     let newDate = updateInput.value;
 
-    // Update the latest period date at the top of history
     if (periodHistory.length > 0) {
         periodHistory[0] = newDate;
     } else {
         periodHistory.unshift(newDate);
     }
 
-    // Save updated date to MySQL database
-    fetch("save_period.php", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: "period_date=" + encodeURIComponent(newDate)
-    })
-    .then(function(response) {
-        return response.text();
-    })
-    .then(function(data) {
-        console.log(data);
+    localStorage.setItem("periodHistory", JSON.stringify(periodHistory));
 
-        if (data === "Period saved successfully.") {
-            if (message) {
-                message.innerText = "Actual period updated & next period recalculated!";
-                message.className = "form-message success";
-            }
-        } else {
-            if (message) {
-                message.innerText = data;
-                message.className = "form-message error";
-            }
-        }
-    })
-    .catch(function(error) {
-        console.error(error);
-        if (message) {
-            message.innerText = "Could not connect to database, updated locally.";
-            message.className = "form-message success";
-        }
-    });
+    if (message) {
+        message.innerText = "Actual period updated & next period recalculated!";
+        message.className = "form-message success";
+    }
 
-    // Recalculate prediction (+28 days) and refresh views
     calculatePeriod();
     updateDashboard();
-
-    // Clear input
     updateInput.value = "";
 }
 
 
 // ================= SYMPTOMS =================
-let symptoms = [];
+
+let symptoms = JSON.parse(localStorage.getItem("symptoms")) || [];
 
 function addSymptom() {
     let symptomInput = document.getElementById("symptom");
@@ -206,74 +124,36 @@ function addSymptom() {
         return;
     }
 
-    // Save symptom to MySQL database
-    fetch("save_symptom.php", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: "symptom=" + encodeURIComponent(symptom)
-    })
-    .then(function(response) {
-        return response.text();
-    })
-    .then(function(data) {
-        console.log(data);
+    let todayStr = new Date().toISOString().split('T')[0];
+    symptoms.unshift({ symptom: symptom, symptom_date: todayStr });
+    localStorage.setItem("symptoms", JSON.stringify(symptoms));
 
-        if (data === "Symptom saved successfully.") {
-            symptoms.push(symptom);
-            localStorage.setItem("symptoms", JSON.stringify(symptoms));
-            displaySymptoms();
-            symptomInput.value = "";
+    displaySymptoms();
+    symptomInput.value = "";
 
-            if (message) {
-                message.innerText = "Symptom saved successfully!";
-                message.className = "form-message success";
-            }
-            updateDashboard();
-        } else {
-            if (message) {
-                message.innerText = data;
-                message.className = "form-message error";
-            }
-        }
-    })
-    .catch(function(error) {
-        console.error(error);
-        if (message) {
-            message.innerText = "Could not connect to the database.";
-            message.className = "form-message error";
-        }
-    });
+    if (message) {
+        message.innerText = "Symptom saved successfully!";
+        message.className = "form-message success";
+    }
+    updateDashboard();
 }
 
-// Display saved symptoms
 function displaySymptoms() {
     let list = document.getElementById("symptomList");
     if (!list) return;
 
-    fetch("get_symptoms.php")
-        .then(function(response) {
-            return response.json();
-        })
-        .then(function(data) {
-            list.innerHTML = "";
-            let dashboardSymptom = document.getElementById("dashboardSymptom");
+    list.innerHTML = "";
+    let dashboardSymptom = document.getElementById("dashboardSymptom");
 
-            if (dashboardSymptom && data.length > 0) {
-                dashboardSymptom.innerText = data[0].symptom;
-            }
+    if (dashboardSymptom && symptoms.length > 0) {
+        dashboardSymptom.innerText = symptoms[0].symptom;
+    }
 
-            data.forEach(function(symptom) {
-                let item = document.createElement("li");
-                item.innerText = symptom.symptom + " - " + symptom.symptom_date;
-                list.appendChild(item);
-            });
-        })
-        .catch(function(error) {
-            console.error(error);
-            list.innerHTML = "<li>Could not load symptoms.</li>";
-        });
+    symptoms.forEach(function(item) {
+        let li = document.createElement("li");
+        li.innerText = item.symptom + " - " + item.symptom_date;
+        list.appendChild(li);
+    });
 }
 
 
@@ -281,8 +161,6 @@ function displaySymptoms() {
 
 let currentMonth = new Date().getMonth();
 let currentYear = new Date().getFullYear();
-let predictedPeriodDate = null;
-let actualPeriodDate = null;
 
 function displayCalendar() {
     let calendarDays = document.getElementById("calendarDays");
@@ -391,67 +269,42 @@ function addReminder() {
     let ampm = ampmElement.value;
 
     if (medication === "" || date === "" || hour === "" || minute === "" || ampm === "") {
-        message.innerText = "Please enter medication, date, and time.";
-        message.className = "form-message error";
+        if (message) {
+            message.innerText = "Please enter medication, date, and time.";
+            message.className = "form-message error";
+        }
         return;
     }
 
     let time = hour + ":" + minute + " " + ampm;
 
-    fetch("save_reminder.php", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        body: "medication=" + encodeURIComponent(medication) + "&reminder_date=" + encodeURIComponent(date) + "&reminder_time=" + encodeURIComponent(time)
-    })
-    .then(function(response) {
-        return response.text();
-    })
-    .then(function(data) {
-        if (data === "Reminder saved successfully.") {
-            reminders.push({ medication: medication, date: date, time: time });
-            displayReminders();
-            medicationElement.value = "";
-            dateElement.value = "";
-            hourElement.value = "";
-            minuteElement.value = "";
-            ampmElement.value = "";
-            message.innerText = "Reminder saved successfully.";
-            message.className = "form-message success";
-            updateDashboard();
-        } else {
-            message.innerText = data;
-            message.className = "form-message error";
-        }
-    })
-    .catch(function(error) {
-        console.error(error);
-        message.innerText = "Could not connect to the database.";
-        message.className = "form-message error";
-    });
+    reminders.unshift({ medication: medication, reminder_date: date, reminder_time: time });
+    localStorage.setItem("reminders", JSON.stringify(reminders));
+
+    displayReminders();
+    medicationElement.value = "";
+    dateElement.value = "";
+    hourElement.value = "";
+    minuteElement.value = "";
+    ampmElement.value = "";
+
+    if (message) {
+        message.innerText = "Reminder saved successfully.";
+        message.className = "form-message success";
+    }
+    updateDashboard();
 }
 
 function displayReminders() {
     let list = document.getElementById("reminderList");
     if (!list) return;
 
-    fetch("get_reminders.php")
-        .then(function(response) {
-            return response.json();
-        })
-        .then(function(data) {
-            list.innerHTML = "";
-            data.forEach(function(reminder) {
-                let item = document.createElement("li");
-                item.innerText = reminder.medication + " - " + reminder.reminder_date + " at " + reminder.reminder_time;
-                list.appendChild(item);
-            });
-        })
-        .catch(function(error) {
-            console.error(error);
-            list.innerHTML = "<li>Could not load reminders.</li>";
-        });
+    list.innerHTML = "";
+    reminders.forEach(function(reminder) {
+        let item = document.createElement("li");
+        item.innerText = reminder.medication + " - " + reminder.reminder_date + " at " + reminder.reminder_time;
+        list.appendChild(item);
+    });
 }
 
 
@@ -481,22 +334,12 @@ function updateDashboard() {
     }
 
     if (nextReminderElement) {
-        fetch("get_reminders.php")
-            .then(function(response) {
-                return response.json();
-            })
-            .then(function(data) {
-                if (data.length === 0) {
-                    nextReminderElement.innerText = "No reminders scheduled";
-                    return;
-                }
-                let nextReminder = data[0];
-                nextReminderElement.innerText = nextReminder.medication + " - " + nextReminder.reminder_date + " at " + nextReminder.reminder_time;
-            })
-            .catch(function(error) {
-                console.error(error);
-                nextReminderElement.innerText = "No reminders scheduled";
-            });
+        if (reminders.length === 0) {
+            nextReminderElement.innerText = "No reminders scheduled";
+        } else {
+            let nextReminder = reminders[0];
+            nextReminderElement.innerText = nextReminder.medication + " - " + nextReminder.reminder_date + " at " + nextReminder.reminder_time;
+        }
     }
 }
 
@@ -513,18 +356,13 @@ if (document.getElementById("calendarDays")) {
     displayCalendar();
 }
 
+if (document.getElementById("reminderList")) {
+    displayReminders();
+}
+
 updateDashboard();
 
-fetch("get_user.php")
-    .then(function(response) {
-        return response.json();
-    })
-    .then(function(data) {
-        let welcomeMessage = document.getElementById("welcomeMessage");
-        if (welcomeMessage && data.name !== "") {
-            welcomeMessage.innerText = "Hello, " + data.name + "! 🌸";
-        }
-    })
-    .catch(function(error) {
-        console.error("Could not load user name:", error);
-    });
+let welcomeMessage = document.getElementById("welcomeMessage");
+if (welcomeMessage) {
+    welcomeMessage.innerText = "Hello, User! 🌸";
+}
