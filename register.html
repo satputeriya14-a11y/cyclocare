@@ -87,11 +87,6 @@
             let nameInput = document.getElementById("name") ? document.getElementById("name").value.trim() : "";
             let emailInput = document.getElementById("email") ? document.getElementById("email").value.trim() : "";
             
-            // Clear old user data for the new account
-            localStorage.removeItem("periodHistory");
-            localStorage.removeItem("symptoms");
-            localStorage.removeItem("reminders");
-
             sessionStorage.setItem("loggedIn", "true");
             
             if (nameInput) {
@@ -107,6 +102,7 @@
 
             window.location.href = "index.html";
         }
+   
     </script>
 
 </body>
