@@ -64,7 +64,7 @@
         function handleLogin(event) {
             event.preventDefault(); // Stop form from submitting to login.php
             
-            let emailInput = document.getElementById("email").value;
+            let emailInput = document.getElementById("email").value.trim();
             
             // Save login state and user info in browser storage
             sessionStorage.setItem("loggedIn", "true");

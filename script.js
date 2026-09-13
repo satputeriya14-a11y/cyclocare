@@ -364,6 +364,6 @@ updateDashboard();
 
 let welcomeMessage = document.getElementById("welcomeMessage");
 if (welcomeMessage) {
-    let savedName = localStorage.getItem("userName") || "User";
-    welcomeMessage.innerText = "Hello, " + savedName + "! 🌸";
+    let savedName = localStorage.getItem("userName");
+    welcomeMessage.innerText = savedName ? "Hello, " + savedName + "! 🌸" : "Hello! 🌸";
 }
