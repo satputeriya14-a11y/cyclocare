@@ -1,14 +1,21 @@
 // ================= PERIOD HISTORY (LOCAL STORAGE) =================
 
 let userKey = localStorage.getItem("currentUserKey") || "default";
+
+// Load user-specific arrays dynamically
 let periodHistory = JSON.parse(localStorage.getItem(userKey + "_periodHistory")) || [];
 
 function loadPeriodsFromDatabase() {
-    console.log("Periods loaded from local storage:", periodHistory);
+    userKey = localStorage.getItem("currentUserKey") || "default";
+    periodHistory = JSON.parse(localStorage.getItem(userKey + "_periodHistory")) || [];
+    symptoms = JSON.parse(localStorage.getItem(userKey + "_symptoms")) || [];
+    reminders = JSON.parse(localStorage.getItem(userKey + "_reminders")) || [];
+
+    console.log("Periods loaded for " + userKey + ":", periodHistory);
     if (periodHistory.length > 0) {
         calculatePeriod();
-        updateDashboard();
     }
+    updateDashboard();
 }
 
 function addPeriod() {
