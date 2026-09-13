@@ -319,7 +319,6 @@ function displayReminders() {
 
 
 // ================= DASHBOARD =================
-
 function updateDashboard() {
     let lastPeriodElement = document.getElementById("dashboardLastPeriod");
     let nextPeriodElement = document.getElementById("dashboardNextPeriod");
@@ -327,7 +326,9 @@ function updateDashboard() {
 
     if (lastPeriodElement) {
         if (periodHistory.length > 0) {
-            lastPeriodElement.innerText = periodHistory[0];
+            let parts = periodHistory[0].split("-");
+            let d = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
+            lastPeriodElement.innerText = d.toLocaleDateString();
         } else {
             lastPeriodElement.innerText = "No period recorded";
         }
@@ -335,7 +336,8 @@ function updateDashboard() {
 
     if (nextPeriodElement) {
         if (periodHistory.length > 0) {
-            let nextDate = new Date(periodHistory[0] + "T00:00:00");
+            let parts = periodHistory[0].split("-");
+            let nextDate = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
             nextDate.setDate(nextDate.getDate() + 28);
             nextPeriodElement.innerText = nextDate.toLocaleDateString();
         } else {
@@ -352,7 +354,6 @@ function updateDashboard() {
         }
     }
 }
-
 
 // ================= INITIALIZE =================
 
