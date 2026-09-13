@@ -25,7 +25,7 @@
 
             <p>Create your CycloCare account to start tracking.</p>
 
-            <form action="register.php" method="POST">
+           <form onsubmit="handleRegister(event)">
 
                 <label for="name">Full Name</label>
                 <input
@@ -80,7 +80,34 @@
         <p>© 2026 CycloCare | Period Health & Wellness System</p>
     </footer>
 
-    <script src="script.js"></script>
+    <script>
+        function handleRegister(event) {
+            event.preventDefault();
+            
+            let nameInput = document.getElementById("name") ? document.getElementById("name").value.trim() : "";
+            let emailInput = document.getElementById("email") ? document.getElementById("email").value.trim() : "";
+            
+            // Clear old user data for the new account
+            localStorage.removeItem("periodHistory");
+            localStorage.removeItem("symptoms");
+            localStorage.removeItem("reminders");
+
+            sessionStorage.setItem("loggedIn", "true");
+            
+            if (nameInput) {
+                localStorage.setItem("userName", nameInput);
+            } else if (emailInput) {
+                let namePart = emailInput.split('@')[0];
+                localStorage.setItem("userName", namePart.charAt(0).toUpperCase() + namePart.slice(1));
+            }
+            
+            if (emailInput) {
+                localStorage.setItem("userEmail", emailInput);
+            }
+
+            window.location.href = "index.html";
+        }
+    </script>
 
 </body>
 
