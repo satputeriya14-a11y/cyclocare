@@ -93,10 +93,13 @@ function updateActualPeriod() {
 
     let newDate = updateInput.value;
 
-    if (periodHistory.length > 0) {
-        periodHistory[0] = newDate;
-    } else {
-        periodHistory.unshift(newDate);
+    // Add new date to history if it's not already logged
+    if (!periodHistory.includes(newDate)) {
+        periodHistory.push(newDate);
+        // Sort from newest to oldest
+        periodHistory.sort(function(a, b) {
+            return new Date(b) - new Date(a);
+        });
     }
 
     localStorage.setItem(userKey + "_periodHistory", JSON.stringify(periodHistory));
