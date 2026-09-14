@@ -69,8 +69,11 @@
             let name = localStorage.getItem("userName") || "CycloCare User";
             let email = localStorage.getItem("userEmail") || "user@cyclocare.com";
 
-            document.getElementById("profileName").innerText = name;
-            document.getElementById("profileEmail").innerText = email;
+            let nameElem = document.getElementById("profileName");
+            let emailElem = document.getElementById("profileEmail");
+            
+            if (nameElem) nameElem.innerText = name;
+            if (emailElem) emailElem.innerText = email;
 
             // Load user-specific period history
             let userKey = localStorage.getItem("currentUserKey") || "default";
@@ -79,7 +82,9 @@
 
             if (historyList) {
                 if (history.length > 0) {
-                    historyList.innerHTML = "";
+                    historyList.innerHTML = ""; // Clear default text
+                    let currentMonthYear = "";
+
                     history.forEach(function(startDateStr) {
                         let parts = startDateStr.split("-");
                         let start = new Date(parseInt(parts[0], 10), parseInt(parts[1], 10) - 1, parseInt(parts[2], 10));
@@ -88,20 +93,46 @@
                         let end = new Date(start);
                         end.setDate(end.getDate() + 4);
 
-                        let formattedStart = start.toLocaleDateString();
-                        let formattedEnd = end.toLocaleDateString();
+                        // Extract Month and Year (e.g., "September 2026")
+                        let monthYear = start.toLocaleString("default", { month: "long", year: "numeric" });
 
-                        let li = document.createElement("li");
-                        li.style.padding = "8px 0";
-                        li.style.borderBottom = "1px solid #eee";
-                        li.innerText = "Start: " + formattedStart + "  |  End: " + formattedEnd;
-                        historyList.appendChild(li);
+                        // Format dates strictly to "8 Sep 2026"
+                        let options = { day: "numeric", month: "short", year: "numeric" };
+                        let formattedStart = start.toLocaleDateString("en-GB", options);
+                        let formattedEnd = end.toLocaleDateString("en-GB", options);
+
+                        // If the month changes, create a new heading
+                        if (monthYear !== currentMonthYear) {
+                            let monthHeading = document.createElement("h4");
+                            monthHeading.innerText = monthYear;
+                            monthHeading.style.marginTop = "15px";
+                            monthHeading.style.marginBottom = "5px";
+                            monthHeading.style.color = "#d63384"; // matches cyclocare vibe
+                            historyList.appendChild(monthHeading);
+                            currentMonthYear = monthYear;
+                        }
+
+                        // Create the bullet points for start and end
+                        let ul = document.createElement("ul");
+                        ul.style.listStyleType = "disc";
+                        ul.style.paddingLeft = "20px";
+                        ul.style.marginBottom = "10px";
+
+                        let liStart = document.createElement("li");
+                        liStart.innerText = "Period Start: " + formattedStart;
+                        let liEnd = document.createElement("li");
+                        liEnd.innerText = "Period End: " + formattedEnd;
+
+                        ul.appendChild(liStart);
+                        ul.appendChild(liEnd);
+                        historyList.appendChild(ul);
                     });
                 } else {
                     historyList.innerHTML = "<li>No period history logged yet.</li>";
                 }
             }
         }
+ 
 
         function logoutUser() {
             // Clear session so index.html doesn't auto-login again
